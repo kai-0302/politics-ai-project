@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>政治 × AI // 小組專題報告</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Inter & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // Fully unified Apple standard typography stack (Sans-serif only)
+                        sans: ['"SF Pro Display"', '"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', 'Inter', '"PingFang TC"', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        apple: {
+                            dark: '#1d1d1f',
+                            secondary: '#86868b',
+                            lightbg: '#f5f5f7',
+                            blue: '#0071e3',
+                            border: '#e8e8ed'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Apple Smooth Scroll and Translucency curves */
+        .apple-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+        }
+        /* Apple Scroll Reveal transition curves */
+        .reveal {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom delicate Apple scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d2d2d7;
+            border-radius: 99px;
+        }
+        ::selection {
+            background-color: rgba(0, 113, 227, 0.12);
+            color: #000000;
+        }
+
+        /* Scanbar laser animation for crowd vision scanner */
+        @keyframes scanLaser {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+        .scanner-laser {
+            animation: scanLaser 4s ease-in-out infinite;
+        }
+
+        /* Pulse critical alert animation */
+        @keyframes criticalPulse {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.4); background-color: rgba(239, 68, 68, 0.02); }
+            50% { border-color: rgba(239, 68, 68, 1); background-color: rgba(239, 68, 68, 0.12); }
+        }
+        .vision-alert-critical {
+            animation: criticalPulse 1.5s infinite;
+        }
+
+        /* Canva & Google Sites Iframe Fluid Layout Fallback */
+        @media (max-height: 650px) {
+            section {
+                padding-top: 3rem !important;
+                padding-bottom: 3rem !important;
+            }
+            .min-h-screen {
+                min-height: 0 !important;
+                height: auto !important;
+                padding-top: 4.5rem !important;
+                padding-bottom: 2.5rem !important;
+            }
+            h1 {
+                font-size: 2.75rem !important;
+            }
+            .reveal {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-apple-dark font-sans overflow-x-hidden antialiased tracking-tight">
+
+    <!-- Apple Navigation Bar -->
+    <nav class="sticky top-0 w-full z-50 apple-nav border-b border-apple-lightbg transition-all duration-300">
+        <div class="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
+            <div class="flex items-center space-x-1.5 cursor-pointer z-50" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <!-- Pristine Apple-style Typography Logo -->
+                <span class="font-sans font-bold text-sm tracking-widest text-apple-dark">政治 <span class="font-light text-apple-secondary">×</span> AI</span>
+            </div>
+            
+            <!-- Desktop menu items (Hidden on Mobile & Tablet/Canva embeds to avoid overlapping) -->
+            <div class="hidden lg:flex items-center space-x-8 text-[12px] tracking-wide">
+                <a href="#philosophy" class="nav-spy font-normal text-apple-secondary opacity-60 hover:text-apple-blue transition-all duration-200">核心哲學</a>
+                <a href="#intelligence" class="nav-spy font-normal text-apple-secondary opacity-60 hover:text-apple-blue transition-all duration-200">規格比較</a>
+                <a href="#sandbox" class="nav-spy font-normal text-apple-secondary opacity-60 hover:text-apple-blue transition-all duration-200">智慧模擬</a>
+                <a href="#values" class="nav-spy font-normal text-apple-secondary opacity-60 hover:text-apple-blue transition-all duration-200">效益價值</a>
+                <a href="#security" class="nav-spy font-normal text-apple-secondary opacity-60 hover:text-apple-blue transition-all duration-200">安全紅線</a>
+                <a href="#roadmap" class="nav-spy font-normal text-apple-secondary opacity-60 hover:text-apple-blue transition-all duration-200">未來藍圖</a>
+            </div>
+            
+            <!-- Mobile & Tablet Menu Toggle Button (Visible on Canva embeds for clean UI) -->
+            <div class="flex items-center space-x-4 lg:hidden z-50">
+                <button id="mobile-menu-btn" class="text-apple-dark focus:outline-none focus:text-apple-blue transition-all p-1" aria-label="切換選單">
+                    <i id="menu-icon" data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Desktop Right CTA Button (Hidden on Mobile & Tablet) -->
+            <div class="hidden lg:block">
+                <a href="#sandbox" class="bg-apple-blue text-white text-[11px] font-medium px-3.5 py-1 rounded-full hover:opacity-95 transition-all">
+                    實戰模擬
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile & Tablet Translucent Menu Overlay (lg:hidden) -->
+        <div id="mobile-menu" class="hidden fixed inset-0 top-12 w-full h-[calc(100vh-48px)] bg-white/95 backdrop-blur-xl z-40 flex flex-col px-10 py-8 space-y-6 text-lg border-t border-apple-lightbg lg:hidden overflow-y-auto">
+            <a href="#philosophy" class="mobile-nav-link text-apple-dark font-medium border-b border-apple-border pb-3 tracking-wide flex items-center justify-between">
+                <span>核心哲學</span> <i data-lucide="chevron-right" class="w-4 h-4 text-apple-secondary"></i>
+            </a>
+            <a href="#intelligence" class="mobile-nav-link text-apple-dark font-medium border-b border-apple-border pb-3 tracking-wide flex items-center justify-between">
+                <span>規格比較</span> <i data-lucide="chevron-right" class="w-4 h-4 text-apple-secondary"></i>
+            </a>
+            <a href="#sandbox" class="mobile-nav-link text-apple-dark font-medium border-b border-apple-border pb-3 tracking-wide flex items-center justify-between">
+                <span>智慧模擬</span> <i data-lucide="chevron-right" class="w-4 h-4 text-apple-secondary"></i>
+            </a>
+            <a href="#values" class="mobile-nav-link text-apple-dark font-medium border-b border-apple-border pb-3 tracking-wide flex items-center justify-between">
+                <span>效益價值</span> <i data-lucide="chevron-right" class="w-4 h-4 text-apple-secondary"></i>
+            </a>
+            <a href="#security" class="mobile-nav-link text-apple-dark font-medium border-b border-apple-border pb-3 tracking-wide flex items-center justify-between">
+                <span>安全紅線</span> <i data-lucide="chevron-right" class="w-4 h-4 text-apple-secondary"></i>
+            </a>
+            <a href="#roadmap" class="mobile-nav-link text-apple-dark font-medium border-b border-apple-border pb-3 tracking-wide flex items-center justify-between">
+                <span>未來藍圖</span> <i data-lucide="chevron-right" class="w-4 h-4 text-apple-secondary"></i>
+            </a>
+            <div class="pt-6">
+                <a href="#sandbox" class="mobile-nav-link w-full bg-apple-blue text-white text-center py-3 rounded-xl block text-sm font-semibold tracking-wide">
+                    開始實戰模擬
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] lg:min-h-screen flex flex-col justify-between pt-24 pb-12 sm:pt-36 sm:pb-20 px-4 sm:px-6 z-10 bg-white">
+        <div></div> <!-- Spacer -->
+        
+        <div class="max-w-4xl mx-auto text-center">
+            <!-- Badging with unified tracking & Group Title -->
+            <p class="text-[10px] sm:text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-4">
+                小組專題報告 // MAY 17, 2026
+            </p>
+            
+            <!-- Main Huge Header -->
+            <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight leading-none mb-8 text-apple-dark">
+                政治 <span class="font-normal text-apple-secondary">×</span> AI
+            </h1>
+            
+            <!-- Concise Subtitle -->
+            <p class="text-lg md:text-2xl text-apple-secondary max-w-2xl mx-auto font-light leading-relaxed mb-12">
+                我們不能用石器時代的鋤頭，去打現代的數位戰爭。<br>
+                這是一套專為公共事務決策者打造的 <span class="text-apple-dark font-semibold">「數位雙腦」系統</span>。
+            </p>
+
+            <!-- Links resembling Apple's call-to-action buttons (Only keeps 探索核心哲學 centered to prevent wrapping bugs) -->
+            <div class="flex justify-center text-sm font-medium">
+                <a href="#philosophy" class="text-apple-blue hover:underline flex items-center space-x-1">
+                    <span>探索核心哲學</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4 mt-0.5"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer indicator (Team names removed to improve visual focus and layout breathing room) -->
+        <div class="flex flex-col items-center">
+            <i data-lucide="chevron-down" class="w-4 h-4 text-apple-secondary animate-bounce"></i>
+        </div>
+    </section>
+
+    <!-- Section 1: Philosophy (Airy Split Grid) -->
+    <section id="philosophy" class="relative py-16 sm:py-24 md:py-32 px-4 sm:px-6 z-10 max-w-5xl mx-auto reveal">
+        <div class="text-center mb-16 sm:mb-24">
+            <h2 class="text-[11px] sm:text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-3">Core Philosophy / 核心哲學</h2>
+            <p class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-apple-dark">人機協同，智識的分水嶺。</p>
+            <p class="text-apple-secondary mt-3 max-w-lg mx-auto text-xs sm:text-sm leading-relaxed font-light">我們將繁雜低效的資料處理歸於演算法，將最尊嚴的價值取捨留給政治與真實連結。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <!-- AI Co-Processor -->
+            <div class="bg-apple-lightbg rounded-2xl p-6 sm:p-8 flex flex-col justify-between border border-apple-border hover:shadow-sm transition-all duration-300">
+                <div>
+                    <span class="text-[10px] font-bold text-apple-secondary tracking-wider block mb-4">AI CO-PROCESSOR</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-apple-dark mb-4">由 AI 負責高效執行</h3>
+                    <p class="text-apple-secondary text-xs leading-relaxed mb-8 font-light">
+                        釋放資料檢索、格式整理與多重對照等低效益勞動，24小時無休監測社會脈動與大數據。
+                    </p>
+                </div>
+                
+                <ul class="space-y-4 pt-6 border-t border-apple-border/50 text-xs text-apple-dark">
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="check" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">摘要跨國法案</strong>：跨語境海量法規條文，數秒內提煉出核心標準與要義。</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="check" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">全時輿情探勘</strong>：24小時追蹤網路輿論聲量，秒級偵測並預警潛在公關風暴。</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="check" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">矩陣文宣生成</strong>：針對不同分眾、社群平台與語境，5秒內自動輸出適格文案。</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="swords" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">攻防假想敵模擬</strong>：推演政治對手攻擊路線，全面進行政策與演說壓力測試。</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Human Decision -->
+            <div class="bg-apple-lightbg rounded-2xl p-8 flex flex-col justify-between border border-apple-border hover:shadow-sm transition-all duration-300">
+                <div>
+                    <span class="text-[10px] font-bold text-apple-secondary tracking-wider block mb-4">HUMAN DECISION</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-apple-dark mb-4">由人類主導核心決策</h3>
+                    <p class="text-apple-secondary text-xs leading-relaxed mb-8 font-light">
+                        專注於機器永遠無法取代的核心心智，承擔價值判斷、政治協商與情感連結之防線。
+                    </p>
+                </div>
+
+                <ul class="space-y-4 pt-6 border-t border-apple-border/50 text-xs text-apple-dark">
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="shield" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">政治價值取捨</strong>：論證核心公理，判斷何謂對全社會最有利、最具正義的抉擇。</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="users" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">跨黨利益協商</strong>：在多方權衡下進行妥協、安撫與合縱連橫，發揮政治談判藝術。</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="heart" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">建立真實人際連結</strong>：深耕地方、走入基層，用同理心與真實群眾奠定堅實信任。</span>
+                    </li>
+                    <li class="flex items-start space-x-2.5">
+                        <i data-lucide="trophy" class="w-4 h-4 text-apple-dark shrink-0 mt-0.5"></i>
+                        <span><strong class="font-bold">核心戰略定案</strong>：主導最終決策航向，承擔政策成敗責任與政治定論之定奪。</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Specs Compare Grid (Apple Comparison Style) -->
+    <section id="intelligence" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-apple-lightbg z-10 relative border-t border-b border-apple-border reveal">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 sm:mb-20">
+                <h2 class="text-[11px] sm:text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-3">Specifications / 雙腦規格比較</h2>
+                <p class="text-2xl sm:text-3xl font-bold tracking-tight text-apple-dark">如同挑選核心幕僚一樣，指派 AI。</p>
+                <p class="text-apple-secondary mt-3 max-w-xl mx-auto text-xs sm:text-sm font-light">在實際戰場上（民調、輿情、法案），這兩個工具的大腦特質完全不同。我們必須依任務精準調度。</p>
+            </div>
+
+            <!-- Side by Side Compare Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <!-- Column 1: Claude -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-apple-border shadow-sm">
+                    <div class="border-b border-apple-lightbg pb-6 mb-6">
+                        <span class="text-[10px] text-apple-secondary tracking-wider font-bold">RESEARCHER & ORATOR</span>
+                        <h3 class="text-xl sm:text-2xl font-bold text-apple-dark mt-1">Claude Brain</h3>
+                        <p class="text-xs text-apple-blue font-semibold mt-1">最適角色：法案研究員 兼 文案演說家</p>
+                    </div>
+                    
+                    <div class="space-y-6 text-xs text-apple-dark">
+                        <div>
+                            <span class="text-apple-secondary block mb-1">大腦核心優勢</span>
+                            <span class="font-bold text-xs sm:text-sm leading-relaxed">長文本處理能力極佳，文筆極具人情味、邏輯細膩，極度擅長撰寫複雜、嚴肅且具備深度的法理政論。</span>
+                        </div>
+                        <div>
+                            <span class="text-apple-secondary block mb-1">最擅長任務</span>
+                            <span class="font-bold text-xs sm:text-sm leading-relaxed">分析並對比美、日、台法案架構、微調法律用詞用字、產出具政治同理心的洗版社群澄清文宣。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: ChatGPT -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-apple-border shadow-sm">
+                    <div class="border-b border-apple-lightbg pb-6 mb-6">
+                        <span class="text-[10px] text-apple-secondary tracking-wider font-bold">TACTICIAN & STRATEGIST</span>
+                        <h3 class="text-xl sm:text-2xl font-bold text-apple-dark mt-1">ChatGPT Brain</h3>
+                        <p class="text-xs text-apple-blue font-semibold mt-1">最適角色：選戰幕僚 兼 攻防假想敵</p>
+                    </div>
+                    
+                    <div class="space-y-6 text-xs text-apple-dark">
+                        <div>
+                            <span class="text-apple-secondary block mb-1">大腦核心優勢</span>
+                            <span class="font-bold text-xs sm:text-sm leading-relaxed">邏輯推理、程式代碼撰寫與海量非結構化數據處理能力卓越。同時，其聯網搜尋與即時輿情探勘生態圈極度成熟。</span>
+                        </div>
+                        <div>
+                            <span class="text-apple-secondary block mb-1">最擅長任務</span>
+                            <span class="font-bold text-xs sm:text-sm leading-relaxed">快速處理分析社群留言、執行宏觀社會經濟影響評估（RIA）、推演並模擬對手最犀利的攻擊論點。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: macOS-style SandBox (Light Clean Playgrounds Interface) -->
+    <section id="sandbox" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 z-10 relative bg-white reveal">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12 sm:mb-16">
+                <h2 class="text-[11px] sm:text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-3">Live Simulation / 實戰模擬艙</h2>
+                <p class="text-2xl sm:text-3xl font-bold tracking-tight text-apple-dark">人機協作。多模態智能演算。</p>
+                <p class="text-apple-secondary mt-4 text-xs font-light max-w-xl mx-auto">
+                    本模擬艙整合了<b>大語言模型</b>與<b>前沿邊緣 AI 計算</b>。您可以使用內建場景、即時 Gemini Live 助理，或切換至最新開發的「影像情緒與集會人臉偵測」進行即時模擬。
+                </p>
+            </div>
+
+            <!-- Double-Mode Option Tabs (Apple-Style Segmented Controls) -->
+            <div class="flex justify-center mb-8">
+                <div class="bg-apple-lightbg p-1 rounded-full border border-apple-border flex space-x-1 shadow-sm overflow-x-auto max-w-full">
+                    <button id="btn-mode-preset" onclick="setSandboxMode('preset')" class="px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 bg-apple-dark text-white shadow-sm shrink-0">
+                        內建沙盤推演
+                    </button>
+                    <button id="btn-mode-live" onclick="setSandboxMode('live')" class="px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 text-apple-secondary hover:text-apple-dark shrink-0">
+                        ✨ Live 智慧助理
+                    </button>
+                    <button id="btn-mode-vision" onclick="setSandboxMode('vision')" class="px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 text-apple-secondary hover:text-apple-dark shrink-0 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                        👁️ 影像情緒偵測
+                    </button>
+                </div>
+            </div>
+
+            <!-- macOS Swift Playground UI Mock -->
+            <div class="bg-white rounded-2xl overflow-hidden shadow-2xl border border-apple-border grid grid-cols-1 md:grid-cols-3">
+                
+                <!-- LEFT CONTROL COLUMN (Swaps dynamically) -->
+                <div class="bg-apple-lightbg/60 p-5 sm:p-6 border-b md:border-b-0 md:border-r border-apple-border flex flex-col justify-between min-h-[380px] md:min-h-[460px]">
+                    <div>
+                        <!-- System bar dots -->
+                        <div class="flex space-x-1.5 mb-6">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
+                        </div>
+
+                        <!-- Left Presets Controller -->
+                        <div id="left-presets" class="space-y-4">
+                            <span class="text-[10px] text-apple-secondary font-bold block mb-1">DEMO LIST</span>
+                            <h4 class="text-sm font-bold text-apple-dark mb-4">預置演練場景</h4>
+                            <div class="space-y-2">
+                                <button onclick="triggerSimulation(1)" class="w-full text-left p-3 rounded-lg text-xs bg-white border border-apple-border font-bold hover:bg-neutral-50 transition-all text-apple-dark shadow-sm flex items-center justify-between">
+                                    <span>場景一：輿情掌握戰場</span>
+                                    <i data-lucide="play" class="w-3.5 h-3.5 text-apple-blue shrink-0"></i>
+                                </button>
+                                <button onclick="triggerSimulation(2)" class="w-full text-left p-3 rounded-lg text-xs bg-white border border-apple-border font-bold hover:bg-neutral-50 transition-all text-apple-dark shadow-sm flex items-center justify-between">
+                                    <span>場景二：法案專業化戰場</span>
+                                    <i data-lucide="play" class="w-3.5 h-3.5 text-apple-blue shrink-0"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Left Live Assistant Controller -->
+                        <div id="left-live" class="space-y-4 hidden">
+                            <span class="text-[10px] text-apple-secondary font-bold block mb-1">✨ GEMINI LIVE</span>
+                            <h4 class="text-sm font-bold text-apple-dark mb-3">自訂公共議題</h4>
+                            <div class="space-y-3">
+                                <textarea id="live-input-text" placeholder="請輸入您想探討的法規或社會危機事件（例：AI 智慧醫療安全合規、青年購屋低利貸款條例）" class="w-full p-3 text-xs bg-white border border-apple-border rounded-lg h-20 focus:outline-none focus:border-apple-blue font-sans text-apple-dark placeholder-apple-secondary leading-relaxed resize-none shadow-sm"></textarea>
+                                
+                                <div>
+                                    <label class="text-[10px] text-apple-secondary font-bold block mb-1">選擇核心大腦</label>
+                                    <select id="live-brain-select" class="w-full p-2 bg-white border border-apple-border rounded-lg text-xs font-semibold focus:outline-none focus:border-apple-blue text-apple-dark">
+                                        <option value="hybrid">🧬 雙腦極致協同 (整合輸出)</option>
+                                        <option value="claude">🧠 Claude 模式 (法案與演講)</option>
+                                        <option value="chatgpt">🧠 ChatGPT 模式 (數據與 RIA)</option>
+                                    </select>
+                                </div>
+
+                                <div class="pt-2 border-t border-apple-border/60">
+                                    <label class="text-[10px] text-apple-secondary font-bold block mb-1">✨ GEMINI API KEY 設定 (選填)</label>
+                                    <div class="flex flex-col sm:flex-row gap-1.5">
+                                        <input type="password" id="api-key-input" placeholder="本地端 API Key" class="flex-1 p-2 text-[11px] bg-white border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue text-apple-dark font-mono shadow-inner w-full">
+                                        <button onclick="saveApiKey()" class="px-3 py-1.5 sm:py-1 bg-apple-dark text-white rounded-lg text-[10px] font-bold hover:opacity-90 transition-all w-full sm:w-auto shrink-0">套用</button>
+                                    </div>
+                                    <p class="text-[9px] text-apple-secondary mt-1 font-light">金鑰會安全加密處理，在沙箱受阻時改以網頁內存載入。</p>
+                                </div>
+
+                                <button onclick="triggerLiveGemini()" class="w-full py-2.5 px-4 bg-apple-blue text-white rounded-lg text-xs font-bold hover:opacity-95 transition-all shadow-sm flex items-center justify-center space-x-1.5">
+                                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                                    <span>✨ 啟動大模型決策演算</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Left Crowd Vision Controller -->
+                        <div id="left-vision" class="space-y-4 hidden">
+                            <span class="text-[10px] text-apple-secondary font-bold block mb-1">👁️ CAMERA HUD CONTROL</span>
+                            <h4 class="text-sm font-bold text-apple-dark mb-3">多模態集會掃描</h4>
+                            
+                            <div class="space-y-4 text-xs">
+                                <div>
+                                    <label class="text-[10px] text-apple-secondary font-bold block mb-1">集會型態模型注入</label>
+                                    <select id="vision-preset-select" onchange="changeVisionPreset(this.value)" class="w-full p-2 bg-white border border-apple-border rounded-lg font-semibold focus:outline-none focus:border-apple-blue text-apple-dark">
+                                        <option value="peace">🕊️ 和平集會（低張力模型）</option>
+                                        <option value="protest">🔥 衝突抗爭（高衝突預警模型）</option>
+                                        <option value="parade">🎉 節慶遊行（歡樂/興奮判定）</option>
+                                    </select>
+                                </div>
+
+                                <!-- Privacyblur switch corresponding directly to Apple's privacy values -->
+                                <div class="bg-white p-3 rounded-xl border border-apple-border space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-[10.5px] text-apple-dark">去識別化去隱私遮罩</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="privacy-blur-toggle" onchange="togglePrivacyBlur(this.checked)" class="sr-only peer" checked>
+                                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-apple-blue"></div>
+                                        </label>
+                                    </div>
+                                    <p class="text-[9px] text-apple-secondary leading-relaxed font-light">開啟後，系統會於本機端自動為人臉鎖定框添加「毛玻璃霧化遮罩」，確保群眾之個資防禦與肖像安全權利。</p>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-[10px] font-bold text-apple-secondary">
+                                        <span>大數據遙測掃描頻率</span>
+                                        <span id="scan-rate-txt">15 Hz</span>
+                                    </div>
+                                    <input type="range" min="5" max="30" value="15" oninput="document.getElementById('scan-rate-txt').innerText=this.value+' Hz'" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-apple-blue">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-apple-border text-[10px] text-apple-secondary font-bold leading-relaxed flex items-center space-x-1">
+                        <span>Workspace Core // Team Report </span>
+                    </div>
+                </div>
+
+                <!-- RIGHT VIEWPORT COLUMN (Swaps dynamically) -->
+                
+                <!-- Terminal Output viewport (Used for Presets and Gemini Live) -->
+                <div id="right-console-viewport" class="md:col-span-2 p-5 sm:p-8 font-sans text-xs bg-white flex flex-col justify-between h-[400px] md:h-[490px]">
+                    <div class="overflow-y-auto space-y-4 pr-1 h-full" id="console-screen">
+                        <span class="text-apple-secondary italic font-light block">模擬艙已就緒。切換至上方「✨ Live 智慧助理」可解鎖與 Google 雲端 Gemini API 的即時串接連線。</span>
+                    </div>
+                    
+                    <div class="border-t border-apple-lightbg pt-3 text-[10px] text-apple-secondary flex justify-between font-bold items-center">
+                        <div class="flex items-center space-x-2">
+                            <span>Workspace_App.log</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                            <span class="text-green-600 font-semibold">100% Connected</span>
+                        </div>
+                        <button id="btn-copy-result" onclick="copyConsoleOutput()" class="hidden text-apple-blue hover:underline flex items-center space-x-1 text-[10px] font-bold">
+                            <i data-lucide="copy" class="w-3 h-3"></i>
+                            <span>✨ 複製成果</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WWDC AI Crowd Vision scanner viewport (Used for Vision Scanner) -->
+                <div id="right-vision-viewport" class="md:col-span-2 bg-neutral-950 p-6 flex flex-col justify-between h-[490px] text-white hidden relative overflow-hidden">
+                    
+                    <!-- Tactical Cam View -->
+                    <div class="relative w-full h-[280px] bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-inner">
+                        
+                        <!-- Radar Grid Coordinates Overlay -->
+                        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+                        
+                        <!-- Animated Scanning Laser line -->
+                        <div class="absolute left-0 w-full h-[1.5px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-80 scanner-laser pointer-events-none" id="vision-laser"></div>
+                        
+                        <!-- Camera Info HUD -->
+                        <div class="absolute top-4 left-4 flex items-center gap-1.5 text-[10px] font-mono tracking-wider opacity-80 bg-black/40 px-2.5 py-1 rounded-full border border-white/10">
+                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span>
+                            <span>LIVE</span>
+                            <span class="text-white/40">|</span>
+                            <span>CAM 04 - TAIPEI SQUARE</span>
+                        </div>
+
+                        <!-- Critical Threat Warning HUD -->
+                        <div id="vision-alert-banner" class="absolute top-4 right-4 hidden text-[10px] font-bold font-mono text-red-500 bg-red-950/80 border border-red-500 px-3 py-1 rounded-full animate-pulse z-20">
+                            CRITICAL TENSION THRESHOLD REACHED
+                        </div>
+
+                        <!-- Mock Protest Scene with Face bounding boxes inside relative view -->
+                        <div class="absolute inset-0 flex items-center justify-around p-8">
+                            
+                            <!-- Face Node 1 -->
+                            <div class="relative group cursor-pointer flex flex-col items-center">
+                                <div class="w-14 h-14 border border-emerald-400 transition-all duration-300 relative rounded flex items-center justify-center" id="box-1">
+                                    <!-- Privacy blur layer (Frosted glass) -->
+                                    <div id="blur-1" class="absolute inset-0 backdrop-blur-md bg-white/10 rounded transition-all duration-300"></div>
+                                    <i data-lucide="user" class="w-6 h-6 text-emerald-400 opacity-60"></i>
+                                </div>
+                                <div class="absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-emerald-400/30 whitespace-nowrap text-emerald-400 z-10" id="box-lbl-1">
+                                    ID: 018 | Calm (92%)
+                                </div>
+                            </div>
+
+                            <!-- Face Node 2 -->
+                            <div class="relative group cursor-pointer flex flex-col items-center">
+                                <div class="w-14 h-14 border border-emerald-400 transition-all duration-300 relative rounded flex items-center justify-center" id="box-2">
+                                    <!-- Privacy blur layer (Frosted glass) -->
+                                    <div id="blur-2" class="absolute inset-0 backdrop-blur-md bg-white/10 rounded transition-all duration-300"></div>
+                                    <i data-lucide="user" class="w-6 h-6 text-emerald-400 opacity-60"></i>
+                                </div>
+                                <div class="absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-emerald-400/30 whitespace-nowrap text-emerald-400 z-10" id="box-lbl-2">
+                                    ID: 024 | neutral (84%)
+                                </div>
+                            </div>
+
+                            <!-- Face Node 3 -->
+                            <div class="relative group cursor-pointer flex flex-col items-center">
+                                <div class="w-14 h-14 border border-emerald-400 transition-all duration-300 relative rounded flex items-center justify-center" id="box-3">
+                                    <!-- Privacy blur layer (Frosted glass) -->
+                                    <div id="blur-3" class="absolute inset-0 backdrop-blur-md bg-white/10 rounded transition-all duration-300"></div>
+                                    <i data-lucide="user" class="w-6 h-6 text-emerald-400 opacity-60"></i>
+                                </div>
+                                <div class="absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-emerald-400/30 whitespace-nowrap text-emerald-400 z-10" id="box-lbl-3">
+                                    ID: 092 | support (78%)
+                                </div>
+                            </div>
+
+                            <!-- Face Node 4 -->
+                            <div class="relative group cursor-pointer flex flex-col items-center">
+                                <div class="w-14 h-14 border border-emerald-400 transition-all duration-300 relative rounded flex items-center justify-center" id="box-4">
+                                    <!-- Privacy blur layer (Frosted glass) -->
+                                    <div id="blur-4" class="absolute inset-0 backdrop-blur-md bg-white/10 rounded transition-all duration-300"></div>
+                                    <i data-lucide="user" class="w-6 h-6 text-emerald-400 opacity-60"></i>
+                                </div>
+                                <div class="absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-emerald-400/30 whitespace-nowrap text-emerald-400 z-10" id="box-lbl-4">
+                                    ID: 110 | Calm (81%)
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Diagnostics Log Overlay in viewport bottom -->
+                        <div class="absolute bottom-2 left-4 text-[9px] font-mono opacity-60 max-w-full truncate" id="vision-log-output">
+                            [INFO] AI Vision Scanner initialized. Accuracy: 98.24%
+                        </div>
+                    </div>
+
+                    <!-- Telemetry dashboard charts (WWDC style) -->
+                    <div class="grid grid-cols-3 gap-4 border-t border-white/10 pt-4">
+                        <div class="bg-white/5 rounded-lg p-3 border border-white/5">
+                            <span class="text-[9px] font-bold text-neutral-500 block uppercase">估算集會人數</span>
+                            <span class="text-xl sm:text-2xl font-bold font-mono tracking-tight" id="vision-count-txt">2,481</span>
+                            <span class="text-[9px] text-neutral-400 block mt-1">± 25 人 (即時波形)</span>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3 border border-white/5">
+                            <span class="text-[9px] font-bold text-neutral-500 block uppercase">平均集會緊張指數</span>
+                            <span class="text-xl sm:text-2xl font-bold font-mono tracking-tight text-emerald-400" id="vision-tension-txt">24%</span>
+                            <div class="w-full bg-white/10 h-1 rounded-full mt-2.5 overflow-hidden">
+                                <div class="bg-emerald-400 h-full rounded-full transition-all duration-500" id="vision-tension-bar" style="width: 24%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3 border border-white/5">
+                            <span class="text-[9px] font-bold text-neutral-500 block uppercase">優勢情緒模型比例</span>
+                            <span class="text-xs sm:text-sm font-bold block mt-1 truncate" id="vision-mood-txt">🕊️ 靜冷 / 支持</span>
+                            <div class="space-y-1 mt-1.5">
+                                <div class="flex items-center justify-between text-[8px] text-neutral-400">
+                                    <span id="mood-label-1">靜冷/支持</span>
+                                    <span id="mood-val-1">75%</span>
+                                </div>
+                                <div class="w-full bg-white/10 h-0.5 rounded-full">
+                                    <div class="bg-blue-400 h-full rounded-full transition-all duration-500" id="mood-bar-1" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Benefits -->
+    <section id="values" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-apple-lightbg z-10 relative border-t border-b border-apple-border reveal">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 sm:mb-20">
+                <h2 class="text-[11px] sm:text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-3">Value & Impact / 效益與價值</h2>
+                <p class="text-2xl sm:text-3xl font-bold tracking-tight text-apple-dark">從政治系學生視角：賦能與重塑</p>
+                <p class="text-apple-secondary mt-3 max-w-xl mx-auto text-xs sm:text-sm font-light">
+                    導入生成式 AI 工具，對於我們的「個人學習」以及「系所未來的發展與外部產學連結」，具有突破性的核心價值與具體效益。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+                <!-- Personal -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-apple-border shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-apple-lightbg flex items-center justify-center text-apple-dark mb-6">
+                        <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold text-apple-dark mb-3">AI 對學習或專業養成的幫助</h3>
+                    <p class="text-apple-secondary text-xs leading-relaxed mb-4 font-light">
+                        這項賦能讓文科生得以跨越程式碼、社會民調統計與繁瑣法規檢索的壁壘，直接站在數據與法理的肩膀上洞察選民痛點，將核心精力聚焦於政治意涵與戰略思考。
+                    </p>
+                    <ul class="text-[11px] text-apple-dark space-y-2 border-t border-apple-lightbg pt-4 font-bold">
+                        <li>・ 跨越技術門檻：免去繁複抓取數據，一鍵生成合規民調圖表。</li>
+                        <li>・ 專注政策本質：不耗費時間在機械性排版，全力投入核心價值論證。</li>
+                    </ul>
+                </div>
+
+                <!-- Academic -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-apple-border shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-apple-lightbg flex items-center justify-center text-apple-dark mb-6">
+                        <i data-lucide="network" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold text-apple-dark mb-3">AI 對系所特色或外部連結的價值</h3>
+                    <p class="text-apple-secondary text-xs leading-relaxed mb-4 font-light">
+                        透過 AI 快速產出跨國法案對照、社會 economic 衝擊評估與選民陳情結構化處置，能大幅拉近校園理論思辨與實務運作一線的距離，重塑系所作為「即時公共政策智庫」的外部產學價值。
+                    </p>
+                    <ul class="text-[11px] text-apple-dark space-y-2 border-t border-apple-lightbg pt-4 font-bold">
+                        <li>・ 縮減實戰落差：在校即能以國會辦公室規格，產出完整的法規對比文件。</li>
+                        <li>・ 提升外部對接：快速轉型為敏捷政策研究樞紐，重塑系所產學公信力。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Safety (Clean Apple-Style Light Card Grid) -->
+    <section id="security" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-white reveal animate-none">
+        <div class="max-w-4xl mx-auto border-t border-apple-border pt-16">
+            <div class="text-center mb-16 sm:mb-20">
+                <div class="w-12 h-12 bg-apple-lightbg rounded-full flex items-center justify-center mx-auto mb-6 border border-apple-border shadow-sm">
+                    <i data-lucide="shield-alert" class="w-5 h-5 text-apple-dark"></i>
+                </div>
+                <h2 class="text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-3">Ethics & Privacy / 挑戰與解決方案</h2>
+                <p class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-apple-dark leading-tight">安全與防線。這很核心。</p>
+                <p class="text-apple-secondary mt-4 max-w-lg mx-auto text-sm font-light">政治與法制作業容錯率為零。針對生成式 AI 帶來的挑戰，我們設計出四層防護體系。</p>
+            </div>
+
+            <!-- 2x2 Grid for Challenges & Solutions with perfect height alignment -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-6">
+                <!-- Card 1 -->
+                <div class="bg-apple-lightbg rounded-2xl p-6 sm:p-8 border border-apple-border hover:shadow-md hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between h-full min-h-[340px] sm:min-h-[380px]">
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="text-red-600 font-bold tracking-wider text-[10px] sm:text-[11px] uppercase">Challenge 01 / 智慧幻覺</span>
+                        </div>
+                        <h4 class="font-bold text-base sm:text-lg text-apple-dark mb-2">幻覺與法理錯誤</h4>
+                        <p class="text-apple-secondary leading-relaxed font-light text-xs md:text-sm">
+                            生成式 AI 容易「一本正經地胡說八道」，編造不存在的法律條文 or 判例，未經查核將引發嚴重的誠信危機。
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 sm:p-5 border border-apple-border rounded-xl mt-auto shadow-sm">
+                        <span class="font-bold text-apple-dark text-xs sm:text-sm mb-2 flex items-center gap-2">
+                            <i data-lucide="user-check" class="w-4 h-4 text-apple-blue shrink-0"></i>
+                            落實「人機協同」審查機制
+                        </span>
+                        <p class="text-apple-secondary leading-relaxed font-light text-[10px] sm:text-[11px] md:text-xs">
+                            AI 定位為「草稿擬定者」，人類擔任「最終總編輯」。所有生成內容絕對不能複製貼上，必須建立二次查核（Fact-Checking）標準流程。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-apple-lightbg rounded-2xl p-6 sm:p-8 border border-apple-border hover:shadow-md hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between h-full min-h-[340px] sm:min-h-[380px]">
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="text-red-600 font-bold tracking-wider text-[10px] sm:text-[11px] uppercase">Challenge 02 / 機密洩漏</span>
+                        </div>
+                        <h4 class="font-bold text-base sm:text-lg text-apple-dark mb-2">個資安全與資料庫曝險</h4>
+                        <p class="text-apple-secondary leading-relaxed font-light text-xs md:text-sm">
+                            未公開的政策草案、選民陳情個資或內部戰略，若直接輸入外部商業模型（如免費公開版），將面臨重大的隱私與國安外洩風險。
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 sm:p-5 border border-apple-border rounded-xl mt-auto shadow-sm">
+                        <span class="font-bold text-apple-dark text-xs sm:text-sm mb-2 flex items-center gap-2">
+                            <i data-lucide="lock" class="w-4 h-4 text-apple-blue shrink-0"></i>
+                            採用「企業級加密」與「封閉式」系統
+                        </span>
+                        <p class="text-apple-secondary leading-relaxed font-light text-[10px] sm:text-[11px] md:text-xs">
+                            處理敏感數據時拒絕使用外網免費版 AI。改用企業級加密 API 或在內部架設本地密閉式專用資料庫（RAG），確保數據不流出防火牆。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-apple-lightbg rounded-2xl p-6 sm:p-8 border border-apple-border hover:shadow-md hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between h-full min-h-[340px] sm:min-h-[380px]">
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="text-red-600 font-bold tracking-wider text-[10px] sm:text-[11px] uppercase">Challenge 03 / 數據滯後</span>
+                        </div>
+                        <h4 class="font-bold text-base sm:text-lg text-apple-dark mb-2">資訊滯後與算力部署成本</h4>
+                        <p class="text-apple-secondary leading-relaxed font-light text-xs md:text-sm">
+                            開源模型的知識庫存在截點，難以秒級掌握瞬息萬變的社群輿情，且自建高硬體規格 RAG 智庫的架構與算力成本非常高昂。
+                        </p>
+                    </div>
+                    <div class="bg-white p-5 border border-apple-border rounded-xl mt-auto shadow-sm">
+                        <span class="font-bold text-apple-dark text-xs sm:text-sm mb-2 flex items-center gap-2">
+                            <i data-lucide="terminal" class="w-4 h-4 text-apple-blue shrink-0"></i>
+                            設計嚴格的「防編造指令」
+                        </span>
+                        <p class="text-apple-secondary leading-relaxed font-light text-[10px] sm:text-[11px] md:text-xs">
+                            透過 Prompt Engineering 優化系統指令限制 AI：「若查無此現行法規或判例，請直接回答不知道，嚴禁編造」，以系統防火牆管束幻覺。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-apple-lightbg rounded-2xl p-6 sm:p-8 border border-apple-border hover:shadow-md hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between h-full min-h-[340px] sm:min-h-[380px]">
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="text-red-600 font-bold tracking-wider text-[10px] sm:text-[11px] uppercase">Challenge 04 / 誠信威脅</span>
+                        </div>
+                        <h4 class="font-bold text-base sm:text-lg text-apple-dark mb-2">演算法偏見與深偽傳播</h4>
+                        <p class="text-apple-secondary leading-relaxed font-light text-xs md:text-sm">
+                            模型潛藏偏見可能導致產出政策評估失真；政治傳播上，AI 更易被濫用於深偽影像（Deepfake）與假新聞，破壞民主信任。
+                        </p>
+                    </div>
+                    <div class="bg-white p-4 sm:p-5 border border-apple-border rounded-xl mt-auto shadow-sm">
+                        <span class="font-bold text-apple-dark text-xs sm:text-sm mb-2 flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-apple-blue shrink-0"></i>
+                            實踐「數位誠信」並主動加註
+                        </span>
+                        <p class="text-apple-secondary leading-relaxed font-light text-[10px] sm:text-[11px] md:text-xs">
+                            凡 AI 輔助生成的政見懶人包、圖片 or 講稿，公開發布時一律主動加註「本內容部分由 AI 協作生成」，以此最大化政治透明度與誠信。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Future Roadmap -->
+    <section id="roadmap" class="py-16 sm:py-24 md:py-32 bg-white z-10 relative reveal">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 sm:mb-24">
+                <h2 class="text-[12px] font-bold text-apple-secondary tracking-widest uppercase mb-3">ROADMAP / 未來展望藍圖</h2>
+                <p class="text-2xl sm:text-3xl font-bold tracking-tight text-apple-dark">短、中、長三期發展藍圖</p>
+                <p class="text-apple-secondary mt-4 max-w-xl mx-auto text-sm font-light">引領政治系學生跨越學術思辨與數據壁壘，最終主導智能化公共治理與治理轉型。</p>
+            </div>
+
+            <!-- Ultra Clean Horizontal Timeline Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                <!-- Connector Line -->
+                <div class="hidden md:block absolute top-10 left-[10%] right-[10%] h-[1px] bg-apple-border z-0"></div>
+
+                <!-- Phase 1 -->
+                <div class="bg-apple-lightbg rounded-xl p-6 pt-10 z-10 hover:shadow-sm transition-shadow">
+                    <div class="w-7 h-7 rounded-full bg-apple-dark text-white text-xs font-bold flex items-center justify-center mb-4">
+                        1
+                    </div>
+                    <span class="text-[9px] font-bold text-apple-secondary tracking-widest uppercase block mb-1">短期目標 (在校養成)</span>
+                    <h3 class="text-sm font-bold text-apple-dark mb-2">數位雙腦內化</h3>
+                    <p class="text-apple-secondary text-[11px] leading-relaxed font-light">
+                        將 AI 內化為個人的「數位左右腦」，從日常學術訓練中擺脫低效文獻翻找庶務，專注於思辨與學術批判力之升級。
+                    </p>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="bg-apple-lightbg rounded-xl p-6 pt-10 z-10 hover:shadow-sm transition-shadow">
+                    <div class="w-7 h-7 rounded-full bg-apple-dark text-white text-xs font-bold flex items-center justify-center mb-4">
+                        2
+                    </div>
+                    <span class="text-[9px] font-bold text-apple-secondary tracking-widest uppercase block mb-1">中期目標 (選戰與國會實習)</span>
+                    <h3 class="text-sm font-bold text-apple-dark mb-2">人機協同實戰技術外掛</h3>
+                    <p class="text-apple-secondary text-[11px] leading-relaxed font-light">
+                        將 AI 能力轉化為進入實務界（如國會辦公室、政黨總部、公關智庫）實習時的「技術外掛」，在舆情與立法一線產出即戰力。
+                    </p>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="bg-apple-lightbg rounded-xl p-6 pt-10 z-10 hover:shadow-sm transition-shadow">
+                    <div class="w-7 h-7 rounded-full bg-apple-dark text-white text-xs font-bold flex items-center justify-center mb-4">
+                        3
+                    </div>
+                    <span class="text-[9px] font-bold text-apple-secondary tracking-widest uppercase block mb-1">長期展望 (公共實務戰場)</span>
+                    <h3 class="text-sm font-bold text-apple-dark mb-2">智能化公共治理</h3>
+                    <p class="text-apple-secondary text-[11px] leading-relaxed font-light">
+                        畢業後進入職場，能夠發揮技術視野，主導公共事務團隊的數位升級與轉型，重塑新世代政治工作者的尊嚴與價值。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Conclusion -->
+    <section class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 z-10 relative bg-apple-lightbg border-t border-apple-border">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-[12px] font-semibold text-apple-secondary tracking-widest uppercase mb-4">Conclusion / 結論</h2>
+            <h3 class="text-2xl sm:text-3xl font-bold mb-8 tracking-tight text-apple-dark leading-tight">將最珍貴的時光，<br>留給真正的政策思辨與戰略布局。</h3>
+            
+            <p class="text-apple-secondary leading-relaxed text-xs md:text-sm max-w-xl mx-auto mb-10 font-light text-left md:text-center">
+                本報告梳理了 AI 流於虛假資訊與洩漏隱私的風險，並透過「短、中、長」三期藍圖指引發展。在實作中，我們讓 AI 作為與我們針鋒相對的辯論對手，跨越程式壁壘，將海量民調與法案梳理成清晰脈絡。<br><br>
+                這個構想最深刻的價值，在於將我們從繁瑣的文獻翻找與資料堆疊中解放出來，把寶貴的時間，留給真正需要敏銳同理心、政策思辨與守護民主信任的極致政治藝術。
+            </p>
+
+            <div class="inline-flex flex-col items-center">
+                <span class="text-[10px] text-apple-secondary font-bold uppercase tracking-wider mb-1.5">團隊報告成員</span>
+                <span class="text-apple-dark font-extrabold text-sm">吳鎧聿 ・ 彭羿崴 ・ 蘇昱安</span>
+                <span class="text-[10px] text-apple-secondary mt-1">MAY 17, 2026</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-apple-border px-4 sm:px-6 relative z-10 bg-apple-lightbg text-[#86868b] text-[10px]">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="font-sans font-bold text-xs tracking-widest text-apple-dark">POLITICS <span class="font-light text-apple-secondary">×</span> AI</span>
+                <span>//</span>
+                <span>小組專案報告</span>
+            </div>
+            <div class="font-bold flex items-center space-x-2">
+                <img src="image_33bc2d.png" alt="東海大學政治學系" class="h-4 w-4 object-contain">
+                <span>© 2026 吳鎧聿 / 彭羿崴 / 蘇昱安. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive JS logic -->
+    <script>
+        // Global variables for AI vision simulation state tracking
+        let simulatedTension = 24;
+        let selectedVisionModel = "peace";
+        let privacyBlurActive = true;
+        let telemetryInterval = null;
+
+        // Init Lucide Icons
+        window.onload = function() {
+            lucide.createIcons();
+            
+            // Safe LocalStorage API Key fetching for Google Sites sandbox compatibility
+            let savedKey = "";
+            try {
+                savedKey = localStorage.getItem('user_gemini_api_key') || "";
+            } catch (e) {
+                // localstorage is sandboxed/blocked by browser security in cross-origin iframe (e.g. Google Sites)
+                savedKey = window.__fallback_gemini_key || "";
+            }
+
+            if (savedKey) {
+                const keyInput = document.getElementById('api-key-input');
+                if (keyInput) keyInput.value = savedKey;
+            }
+
+            // Setup smooth scroll jump with dynamic page offset
+            document.querySelectorAll('a[href^="#"], .mobile-nav-link').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    const menuIcon = document.getElementById('menu-icon');
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        if (menuIcon) menuIcon.setAttribute('data-lucide', 'menu');
+                        lucide.createIcons();
+                    }
+
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const navHeight = 48; // h-12 nav bar height
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Mobile menu toggle logic
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if (menuBtn && mobileMenu) {
+                menuBtn.addEventListener('click', function() {
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    if (isHidden) {
+                        mobileMenu.classList.remove('hidden');
+                        if (menuIcon) menuIcon.setAttribute('data-lucide', 'x');
+                    } else {
+                        mobileMenu.classList.add('hidden');
+                        if (menuIcon) menuIcon.setAttribute('data-lucide', 'menu');
+                    }
+                    lucide.createIcons();
+                });
+            }
+
+            // Detect if inside an iframe
+            const isInsideIframe = window.self !== window.top;
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            if (isInsideIframe) {
+                revealElements.forEach(el => {
+                    el.classList.add('active');
+                });
+            } else {
+                const revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if(entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                        }
+                    });
+                }, { threshold: 0.1 });
+                
+                revealElements.forEach(el => {
+                    el.classList.add('reveal');
+                    revealObserver.observe(el);
+                });
+            }
+
+            // Precise ScrollSpy Setup for Nav bar highlighting
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-spy');
+            
+            const spyObserverOptions = {
+                root: null,
+                rootMargin: '-40% 0px -40% 0px',
+                threshold: 0
+            };
+
+            const spyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const activeId = entry.target.getAttribute('id');
+                        updateActiveNav(activeId);
+                    }
+                });
+            }, spyObserverOptions);
+
+            sections.forEach(section => spyObserver.observe(section));
+
+            function updateActiveNav(activeId) {
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href === `#${activeId}`) {
+                        link.classList.remove('font-normal', 'text-apple-secondary', 'opacity-60');
+                        link.classList.add('font-bold', 'text-apple-dark', 'opacity-100');
+                    } else {
+                        link.classList.remove('font-bold', 'text-apple-dark', 'opacity-100');
+                        link.classList.add('font-normal', 'text-apple-secondary', 'opacity-60');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY < 120) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('font-bold', 'text-apple-dark', 'opacity-100');
+                        link.classList.add('font-normal', 'text-apple-secondary', 'opacity-60');
+                    });
+                }
+            });
+
+            // Start background loop for the WWDC Crowd Scanner telemetry numbers
+            startTelemetryLoop();
+        };
+
+        // Switch Sandbox Tab (Preset, Live, or Vision Scanner)
+        function setSandboxMode(mode) {
+            const btnPreset = document.getElementById('btn-mode-preset');
+            const btnLive = document.getElementById('btn-mode-live');
+            const btnVision = document.getElementById('btn-mode-vision');
+
+            const leftPresets = document.getElementById('left-presets');
+            const leftLive = document.getElementById('left-live');
+            const leftVision = document.getElementById('left-vision');
+
+            const rightConsole = document.getElementById('right-console-viewport');
+            const rightVision = document.getElementById('right-vision-viewport');
+
+            // Reset tab styles
+            [btnPreset, btnLive, btnVision].forEach(btn => {
+                btn.className = "px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 text-apple-secondary hover:text-apple-dark shrink-0";
+            });
+
+            // Hide all controllers and screens
+            [leftPresets, leftLive, leftVision, rightConsole, rightVision].forEach(el => el.classList.add('hidden'));
+
+            if (mode === 'preset') {
+                btnPreset.className = "px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 bg-apple-dark text-white shadow-sm shrink-0";
+                leftPresets.classList.remove('hidden');
+                rightConsole.classList.remove('hidden');
+                document.getElementById('console-screen').innerHTML = `<span class="text-apple-secondary italic font-light block">模擬艙已就緒。選擇左側場景，啟動預置戰術演練模擬。</span>`;
+            } else if (mode === 'live') {
+                btnLive.className = "px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 bg-apple-dark text-white shadow-sm shrink-0";
+                leftLive.classList.remove('hidden');
+                rightConsole.classList.remove('hidden');
+                document.getElementById('console-screen').innerHTML = `<span class="text-apple-dark font-semibold block">✨ Live 智慧助理已啟動</span>
+                                           <span class="text-apple-secondary block leading-relaxed mt-1 text-[11px]">請在左側輸入您希望 AI 進行分析、生成或評估的任何政治議題，並選擇欲調度的模型大腦（Claude、ChatGPT 或雙腦協同）進行即時推演。</span>`;
+            } else if (mode === 'vision') {
+                btnVision.className = "px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 bg-apple-dark text-white shadow-sm shrink-0 flex items-center gap-1";
+                leftVision.classList.remove('hidden');
+                rightVision.classList.remove('hidden');
+                // Force sync render
+                changeVisionPreset("peace");
+            }
+            lucide.createIcons();
+        }
+
+        // WWDC Crowd Scanner Preset Changer
+        function changeVisionPreset(val) {
+            selectedVisionModel = val;
+            const logOutput = document.getElementById('vision-log-output');
+            const alertBanner = document.getElementById('vision-alert-banner');
+            const tensionTxt = document.getElementById('vision-tension-txt');
+            const tensionBar = document.getElementById('vision-tension-bar');
+            const moodTxt = document.getElementById('vision-mood-txt');
+            
+            const moodLabel1 = document.getElementById('mood-label-1');
+            const moodVal1 = document.getElementById('mood-val-1');
+            const moodBar1 = document.getElementById('mood-bar-1');
+
+            // Find face target containers to change glow colors
+            const boxes = [1, 2, 3, 4].map(id => document.getElementById(`box-${id}`));
+            const labels = [1, 2, 3, 4].map(id => document.getElementById(`box-lbl-${id}`));
+
+            if (val === "peace") {
+                simulatedTension = 24;
+                alertBanner.classList.add('hidden');
+                tensionTxt.innerText = "24%";
+                tensionTxt.className = "text-xl sm:text-2xl font-bold font-mono tracking-tight text-emerald-400";
+                tensionBar.className = "bg-emerald-400 h-full rounded-full transition-all duration-500";
+                tensionBar.style.width = "24%";
+                moodTxt.innerText = "🕊️ 靜冷 / 支持";
+                moodTxt.className = "text-xs sm:text-sm font-bold block mt-1 truncate text-emerald-400";
+                
+                moodLabel1.innerText = "靜冷/支持";
+                moodVal1.innerText = "78%";
+                moodBar1.style.width = "78%";
+                moodBar1.className = "bg-emerald-400 h-full rounded-full transition-all duration-500";
+
+                logOutput.innerText = `[AI VISION] ${new Date().toLocaleTimeString()} - 調度「和平集會」低張力分析模型。人臉偵測精準度 99.1%`;
+
+                // Update mock targets to green
+                boxes.forEach(box => {
+                    box.className = "w-14 h-14 border border-emerald-400 transition-all duration-300 relative rounded flex items-center justify-center";
+                });
+                labels.forEach((lbl, idx) => {
+                    lbl.className = "absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-emerald-400/30 whitespace-nowrap text-emerald-400 z-10";
+                    lbl.innerText = `ID: 082${idx} | Calm (88%)`;
+                });
+            } else if (val === "protest") {
+                simulatedTension = 88;
+                alertBanner.classList.remove('hidden');
+                tensionTxt.innerText = "88%";
+                tensionTxt.className = "text-xl sm:text-2xl font-bold font-mono tracking-tight text-red-500";
+                tensionBar.className = "bg-red-500 h-full rounded-full transition-all duration-500";
+                tensionBar.style.width = "88%";
+                moodTxt.innerText = "🔥 衝突 / 焦躁";
+                moodTxt.className = "text-xs sm:text-sm font-bold block mt-1 truncate text-red-500 animate-pulse";
+
+                moodLabel1.innerText = "焦躁/激動";
+                moodVal1.innerText = "85%";
+                moodBar1.style.width = "85%";
+                moodBar1.className = "bg-red-500 h-full rounded-full transition-all duration-500";
+
+                logOutput.innerText = `[AI VISION] ${new Date().toLocaleTimeString()} - [⚠️警告] 調度「高衝突預警模型」。偵測到非理性情緒簇。`;
+
+                // Update mock targets to warning red and apply WWDC pulsed critical alert style
+                boxes.forEach(box => {
+                    box.className = "w-14 h-14 border relative rounded flex items-center justify-center vision-alert-critical";
+                });
+                labels.forEach((lbl, idx) => {
+                    lbl.className = "absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-red-500/30 whitespace-nowrap text-red-500 z-10";
+                    lbl.innerText = `ID: 041${idx} | Angered (94%)`;
+                });
+            } else if (val === "parade") {
+                simulatedTension = 12;
+                alertBanner.classList.add('hidden');
+                tensionTxt.innerText = "12%";
+                tensionTxt.className = "text-xl sm:text-2xl font-bold font-mono tracking-tight text-yellow-400";
+                tensionBar.className = "bg-yellow-400 h-full rounded-full transition-all duration-500";
+                tensionBar.style.width = "12%";
+                moodTxt.innerText = "🎉 歡樂 / 興奮";
+                moodTxt.className = "text-xs sm:text-sm font-bold block mt-1 truncate text-yellow-400";
+
+                moodLabel1.innerText = "歡樂/熱情";
+                moodVal1.innerText = "92%";
+                moodBar1.style.width = "92%";
+                moodBar1.className = "bg-yellow-400 h-full rounded-full transition-all duration-500";
+
+                logOutput.innerText = `[AI VISION] ${new Date().toLocaleTimeString()} - 調度「慶典遊行模型」。活動氛圍正向。`;
+
+                // Update mock targets to gold/yellow
+                boxes.forEach(box => {
+                    box.className = "w-14 h-14 border border-yellow-400 transition-all duration-300 relative rounded flex items-center justify-center";
+                });
+                labels.forEach((lbl, idx) => {
+                    lbl.className = "absolute -bottom-8 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono border border-yellow-400/30 whitespace-nowrap text-yellow-400 z-10";
+                    lbl.innerText = `ID: 091${idx} | Excited (91%)`;
+                });
+            }
+        }
+
+        // WWDC Privacy Blur Toggle (Backdrop Blur Mosaic)
+        function togglePrivacyBlur(active) {
+            privacyBlurActive = active;
+            const logOutput = document.getElementById('vision-log-output');
+            const blurs = [1, 2, 3, 4].map(id => document.getElementById(`blur-${id}`));
+
+            blurs.forEach(b => {
+                if (active) {
+                    b.className = "absolute inset-0 backdrop-blur-md bg-white/10 rounded transition-all duration-300";
+                } else {
+                    b.className = "absolute inset-0 bg-transparent rounded transition-all duration-300";
+                }
+            });
+
+            logOutput.innerText = `[AI VISION] ${new Date().toLocaleTimeString()} - 隱私去識別化保護遮罩：${active ? '已啟動(100% BLUR)' : '已關閉(RAW FEED)'}`;
+        }
+
+        // Real-time telemetry simulation numbers loop
+        function startTelemetryLoop() {
+            if (telemetryInterval) clearInterval(telemetryInterval);
+            
+            const countTxt = document.getElementById('vision-count-txt');
+            let baseCount = 2480;
+
+            telemetryInterval = setInterval(() => {
+                // Fluctuate crowd count slightly
+                const randomOffset = Math.floor(Math.random() * 11) - 5; // -5 to +5
+                baseCount += randomOffset;
+                if (countTxt) {
+                    countTxt.innerText = baseCount.toLocaleString();
+                }
+
+                // Periodically print mock log lines to simulation scanner viewport
+                const logOutput = document.getElementById('vision-log-output');
+                if (logOutput && Math.random() > 0.7) {
+                    const logs = [
+                        `[AI VISION] 幀率穩健運作中...`,
+                        `[AI VISION] 偵測到人臉微表情微弱起伏...`,
+                        `[AI VISION] 前線遙測大數據封包編譯成功。`,
+                        `[AI VISION] 機密防護：人臉去識別模糊運算完好。`
+                    ];
+                    logOutput.innerText = logs[Math.floor(Math.random() * logs.length)];
+                }
+            }, 2500);
+        }
+
+        // Save Custom API Key locally with safe Fallback for sandboxed iframes
+        function saveApiKey() {
+            const keyInput = document.getElementById('api-key-input');
+            const keyVal = keyInput ? keyInput.value.trim() : "";
+            
+            try {
+                localStorage.setItem('user_gemini_api_key', keyVal);
+            } catch (e) {
+                // Fallback inside sandboxed Google Sites iframe
+                window.__fallback_gemini_key = keyVal;
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = "fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-apple-dark text-white text-xs py-2.5 px-5 rounded-full shadow-lg z-50 transition-all duration-300 opacity-0";
+            toast.innerText = keyVal ? "✨ API Key 已儲存於本機視窗！" : "✨ 已清除本地 API Key 設定！";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 2000);
+        }
+
+        // Reusable Gemini API Request Client with Exponential Backoff
+        async function callGeminiAPI(prompt, systemInstruction = "") {
+            // Priority: Local Storage -> Window Fallback Memory -> Runtime Environment key
+            let apiKey = "";
+            try {
+                apiKey = localStorage.getItem('user_gemini_api_key') || "";
+            } catch (e) {
+                apiKey = window.__fallback_gemini_key || "";
+            }
+            
+            if (!apiKey) {
+                throw new Error("KEY_MISSING");
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            if (systemInstruction) {
+                payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+            }
+
+            let delay = 1000;
+            let lastError = null;
+            
+            // Retry loop up to 5 times
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) return text;
+                    } else {
+                        const errData = await response.json().catch(() => ({}));
+                        lastError = errData.error?.message || `HTTP 錯誤代碼 ${response.status}`;
+                    }
+                } catch (e) {
+                    lastError = e.message;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Exponential backoff scaling
+            }
+            throw new Error(lastError || "無法連接到智慧大模型。");
+        }
+
+        // Copy dynamic console result to clipboard
+        function copyConsoleOutput() {
+            const consoleScreen = document.getElementById('console-screen');
+            // Create temporary container to copy raw text
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = consoleScreen.innerText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy'); // Using deprecated but highly-reliable command inside frames
+            document.body.removeChild(tempTextArea);
+            
+            // Show custom elegant alert inside interface
+            const toast = document.createElement('div');
+            toast.className = "fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-apple-dark text-white text-xs py-2.5 px-5 rounded-full shadow-lg z-50 transition-all duration-300 opacity-0";
+            toast.innerText = "✨ 生成成果已複製至剪貼簿！";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 2000);
+        }
+
+        // Live Gemini API Action logic
+        async function triggerLiveGemini() {
+            const inputText = document.getElementById('live-input-text').value.trim();
+            const brainSelect = document.getElementById('live-brain-select').value;
+            const consoleScreen = document.getElementById('console-screen');
+            const btnCopy = document.getElementById('btn-copy-result');
+
+            if (!inputText) {
+                consoleScreen.innerHTML = `<span class="text-red-500 font-bold block">[ERROR] 請在左側輸入框輸入您想研究的政策主題。</span>`;
+                return;
+            }
+
+            btnCopy.classList.add('hidden');
+            consoleScreen.innerHTML = `<div class="space-y-2 text-apple-secondary font-sans">
+                <span class="block animate-pulse text-apple-blue font-bold">[SYSTEM] 正在啟動 Gemini-2.5-Flash 神經智慧大腦...</span>
+                <span class="block">[SYSTEM] 正在解析自訂議題結構：<b>"${inputText}"</b></span>
+                <span class="block">[SYSTEM] 正在編譯系統引導指令 (System Prompt)...</span>
+                <span class="block">[SYSTEM] 調度模型：${brainSelect === 'hybrid' ? '🧬 雙腦極致協同' : brainSelect === 'claude' ? '🧠 Claude (法案演說專長)' : '🧠 ChatGPT (數據與衝擊評估專長)'}</span>
+            </div>`;
+
+            // Setup customized prompt system instructions
+            const systemPrompt = `You are a world-class political advisor, public policy architect, and crisis manager. 
+            The user wants analysis on: "${inputText}". 
+            You MUST generate high-quality structured Taiwanese Traditional Chinese content.
+            Use elegant HTML tags such as <p>, <ul>, <li>, <strong>, <h4>, and Tailwind-friendly inline styling if needed for high aesthetic presentation. Do not output markdown backticks or whole document HTML, just inner block HTML.
+            
+            Adhere strictly to the selected model role:
+            - If "claude", act as Claude Brain: Focus heavily on drafting structured law articles/policy briefs and emotional, resonant social-media crisis statements (such as Threads / Press Release).
+            - If "chatgpt", act as ChatGPT Brain: Focus heavily on quantitative analysis, public sentiment sentiment extraction, and rigorous Regulatory Impact Analysis (RIA) with expected synthetic statistics.
+            - If "hybrid", act as both: First outputs step-by-step ChatGPT's Sentiment analytics and RIA, followed by Claude's legal alignment and polished, emotionally fluent press speech.`;
+
+            const promptText = `請針對以下公共政策 or 政治危機事件進行深度智慧決策推演，以高質感的台灣繁體中文 HTML 格式輸出：
+            議題：${inputText}`;
+
+            try {
+                const responseHTML = await callGeminiAPI(promptText, systemPrompt);
+                // Render nicely
+                consoleScreen.innerHTML = `
+                    <div class="space-y-4">
+                        <span class="text-green-600 font-bold block border-b border-apple-border pb-2 flex items-center space-x-1.5">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>✨ 智慧演算編譯成功</span>
+                        </span>
+                        <div class="prose prose-sm text-apple-dark leading-relaxed font-sans max-w-none text-xs md:text-sm">
+                            ${responseHTML}
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons(); // Refresh icons inside generated blocks
+                btnCopy.classList.remove('hidden');
+            } catch (error) {
+                if (error.message === "KEY_MISSING") {
+                    consoleScreen.innerHTML = `
+                        <div class="space-y-3 font-sans text-xs text-apple-dark leading-relaxed">
+                            <div class="text-red-500 font-bold flex items-center gap-1.5">
+                                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                <span>[偵測到外部環境部署：未偵測到本地 API Key]</span>
+                            </div>
+                            <p class="text-apple-secondary">為了能在 Google 協作平台等外部站點上<b>最安全、不洩漏</b>地調用您的運算資源，本系統採用瀏覽器本地金鑰託管：</p>
+                            <div class="bg-apple-lightbg p-4 rounded-xl border border-apple-border space-y-2">
+                                <p class="font-bold">✨ 如何啟用 Live 智慧模擬：</p>
+                                <ol class="list-decimal pl-4 space-y-1 text-apple-secondary text-[11px]">
+                                    <li>前往 <a href="https://aistudio.google.com/" target="_blank" class="text-apple-blue hover:underline font-bold">Google AI Studio</a> 免費申請一組 Gemini API Key。</li>
+                                    <li>複製該 API Key 金鑰。</li>
+                                    <li>在左下角的<b>「✨ GEMINI API KEY 設定」</b>欄位中貼上金鑰，並點擊<b>「套用」</b>。</li>
+                                </ol>
+                            </div>
+                            <p class="text-[10px] text-apple-secondary font-light">註：您的金鑰只會透過 safe 協定直接與 Google Gemini 原生端點加密通訊，金鑰僅託管於您的瀏覽器快取中，絕不會傳輸到任何第三方後台，保障國安級機密性。</p>
+                        </div>
+                    `;
+                } else {
+                    consoleScreen.innerHTML = `
+                        <div class="space-y-2 text-red-500 font-sans">
+                            <span class="font-bold block">[ERROR] 決策演算中斷</span>
+                            <span class="block text-xs font-light">${error.message}</span>
+                            <span class="block text-xs text-apple-secondary font-light">提示：請確認您的 API 金鑰是否輸入正確、餘額充足，或網路是否能正常連線。</span>
+                        </div>
+                    `;
+                }
+                lucide.createIcons();
+            }
+        }
+
+        // Sandbox Simulator Logic with clean, elegant styling (Original offline fallback Demo presets)
+        const consoleScreen = document.getElementById('console-screen');
+        const selectedTaskText = document.getElementById('selected-task-text');
+        let currentInterval = null;
+
+        // Corrected triggerSimulation function to safely handle potential null references
+        function triggerSimulation(taskId) {
+            // Clear screen
+            consoleScreen.innerHTML = '';
+            if (currentInterval) clearInterval(currentInterval);
+
+            if (taskId === 1) {
+                if (selectedTaskText) {
+                    selectedTaskText.innerText = '任務 1：輿情掌握戰場（輿情清洗與矩陣回應）';
+                }
+                runTask1();
+            } else if (taskId === 2) {
+                if (selectedTaskText) {
+                    selectedTaskText.innerText = '任務 2：法案專業化戰場（法理比對與 RIA 模擬）';
+                }
+                runTask2();
+            }
+        }
+
+        function writeToConsole(html, delay = 0) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.innerHTML = html;
+                    consoleScreen.appendChild(div);
+                    consoleScreen.scrollTop = consoleScreen.scrollHeight;
+                    resolve();
+                }, delay);
+            });
+        }
+
+        async function runTask1() {
+            await writeToConsole('<span class="text-neutral-900 font-bold">[SYSTEM]</span> 啟動「輿情掌握戰場」協作程序...', 100);
+            await writeToConsole('<span class="text-neutral-400">[FETCH]</span> 前線(ChatGPT)正自動消化社群媒體 (Threads、PTT、新聞評論) 撈取數據...', 400);
+            await writeToConsole('<span class="text-neutral-400">[FETCH]</span> 累計導入留言樣本：24,821 條非結構化語料。', 300);
+            
+            await writeToConsole('<span class="text-apple-blue font-bold">&gt;&gt; STEP 1: ChatGPT 情感探勘啟動</span>', 400);
+            await writeToConsole('<span class="text-neutral-900 font-semibold">[ChatGPT 輸出]</span> 情感分析報告摘要：<br>' + 
+                                 '  * 民怨極值爆發點：<span class="text-red-600 font-bold">68% 反對不滿</span><br>' + 
+                                 '  * 輿論不滿焦點：質疑該政策程序涉嫌「黑箱、圖利」特定關係人<br>' + 
+                                 '  * 核心負面詞彙簇：[黑箱] / [圖利] / [無能]', 600);
+            
+            await writeToConsole('<span class="text-apple-blue font-bold">&gt;&gt; STEP 2: 傳遞結構化不滿痛點至 Claude 應變文案大腦</span>', 500);
+            await writeToConsole('<span class="text-neutral-900 font-bold">[Claude 輸出 1 / 官方嚴謹媒體聲明]</span><br>' +
+                                 '<div class="bg-apple-lightbg p-4 rounded-xl my-2 border border-apple-border text-apple-dark font-sans leading-relaxed text-[11px]">' +
+                                 '「關於近日外界對政策審查程序之疑慮，本會澄清：審查皆恪守資訊公開法。外界所稱黑箱與事實有極大出入，我們將在三日內公開完整會議記錄與關係人資料...」' +
+                                 '</div>', 800);
+
+            await writeToConsole('<span class="text-neutral-900 font-bold">[Claude 輸出 2 / 首長 Threads 直白洗版澄清]</span><br>' +
+                                 '<div class="bg-apple-lightbg p-4 rounded-xl my-2 border border-apple-border text-apple-dark font-sans leading-relaxed text-[11px]">' +
+                                 '「對新法案的擔憂我聽見了。我保證：絕對沒有黑箱、更無圖利！這週五完整會議記錄『全部公開』！歡迎大家一起監督。」' +
+                                 '</div>', 800);
+
+            await writeToConsole('<span class="text-green-600 font-bold">[SUCCESS]</span> 危機輿情回應矩陣文宣封裝成功。', 400);
+        }
+
+        async function runTask2() {
+            await writeToConsole('<span class="text-neutral-900 font-bold">[SYSTEM]</span> 啟動「法案專業化戰場」跨國研究模擬...', 100);
+            await writeToConsole('<span class="text-neutral-400">[FETCH]</span> 前線(Claude)載入法案草案：台灣《AI基本法》、美、日相關責任與促進法案文本...', 400);
+            
+            await writeToConsole('<span class="text-apple-blue font-bold">&gt;&gt; STEP 1: Claude 立法比較與合規審查啟動</span>', 400);
+            await writeToConsole('<span class="text-neutral-900 font-semibold">[Claude 輸出]</span> 跨國法比較與草案盲點 analysis：<br>' +
+                                 '  * <span class="font-bold">盲點 1：</span>第三條對「弱勢補貼」之判定標準與定義模糊。相較於日本法，容易產生行政裁量權過大疑慮。<br>' +
+                                 '  * <span class="font-bold">盲點 2：</span>責任歸屬判定機制與我國現行《中央法規標準法》存在潛在衝突牴觸風險。', 600);
+
+            await writeToConsole('<span class="text-apple-blue font-bold">&gt;&gt; STEP 2: 傳送嚴謹法案參數至 ChatGPT 進行 RIA 社會經濟影響推演</span>', 500);
+            await writeToConsole('<span class="text-neutral-900 font-semibold">[ChatGPT 輸出]</span> RIA 經濟衝擊模擬評估：<br>' +
+                                 '  * <b>中小企業合規成本：</b>預期第一階段將上升 <span class="font-bold">14.2%</span>，建議編列輔導配套補貼。<br>' +
+                                 '  * <b>產業技術就業率：</b>中短期將增加人工智慧合規檢測專員等新興崗位需求約 <span class="text-green-600 font-bold">22%</span>。<br>' +
+                                 '  * <b>社會福利普及度：</b>中低收入戶數位技能落差可因法案補貼結構有效減少 18%。', 800);
+
+            await writeToConsole('<span class="text-green-600 font-bold">[SUCCESS]</span> 跨國法規審查對照與 RIA 模擬報告生成完畢，已可作為國會質詢數據資產。', 400);
+        }
+    </script>
+</body>
+</html>
